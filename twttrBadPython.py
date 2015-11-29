@@ -14,8 +14,8 @@ class TwitterAPI:
     def tweet(self, message):
         self.api.update_status(status=message)
 
-    def search(self, query, count):
-        return self.api.search(q=query, count=count)
+    def search(self, query, count, since_id):
+        return self.api.search(q=query, count=count, since_id=since_id, lang="es")
 
 def isValid (tweet):
     text = tweet.text.lower()
@@ -29,25 +29,41 @@ def isValid (tweet):
         return (False, 'reponsed in text')
     return (True,'')
 
+def readLastId ():
+    try:
+        file = open("lastid.txt", "r")
+        last_id = file.readline()
+        return int(last_id)
+    except:
+        return -1
+
+def saveLastId (id):
+    file = open("lastid.txt", "w")
+    file.write(str(tweet.id))
+
+
 if __name__ == "__main__":
     twitter = TwitterAPI()
     
-    searched_tweets = []
-    
+    max_id= readLastId ()
+
     try:
         valid_tweet=None
-        new_tweets = twitter.search(query="phyton", count=10)
-        for tweet in new_tweets:
+        new_tweets = twitter.search(query="phyton", count=10, since_id= max_id+1)
+        for tweet in reversed(new_tweets):
 
             valid, cause = isValid(tweet)
             if (valid):
-
+                # print (tweet)
                 valid_tweet = tweet 
-            else:
-                print ("Text invalid:" +tweet.text)
-                print ("Cause:" + cause)
+                break
         if (valid_tweet):
-            print (tweet.text, tweet.id)
+            statusUrl = "https://twitter.com/" + tweet.user.screen_name + "/status/"+ str(tweet.id) + " - " + tweet.text
+            # print ("Selected: ", tweet.text, tweet.id,tweet.user.screen_name)
+                
+            saveLastId(tweet.id)
+            dirMsg = twitter.api.send_direct_message ("xurxof",statusUrl)
+            print(statusUrl,dirMsg)
     except tweepy.TweepError as e:
         # depending on TweepError.code, one may want to retry or wait
         # to keep things simple, we will give up on an error
