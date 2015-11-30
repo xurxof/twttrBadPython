@@ -1,5 +1,5 @@
 from  config import *
-import tweepy
+import tweepy, re
 
 class TwitterAPI:
     def __init__(self):
@@ -17,16 +17,19 @@ class TwitterAPI:
     def search(self, query, count, since_id):
         return self.api.search(q=query, count=count, since_id=since_id, lang="es")
 
+    def sendDM (self, user_screen_name, text):
+        return twitter.api.send_direct_message (user_screen_name, text=text)
+
 def isValid (tweet):
     text = tweet.text.lower()
-    if ('phyton' not in text) :
-        return (False, 'python not in text')
     if ('monty' in text) :
         return (False, 'monty  in text')
     if ('martens' in text) :
         return (False, 'martens in text') # a model of shoes :)
-    if (tweet.id in [670651635048316928]) :
-        return (False, 'reponsed in text')
+    
+    p = re.compile(ur'\bphyton', re.IGNORECASE)
+    if (not re.findall(p, text)):
+        return (False, 'python not in text')
     return (True,'')
 
 def readLastId ():
@@ -41,6 +44,13 @@ def saveLastId (id):
     file = open("lastid.txt", "w")
     file.write(str(tweet.id))
 
+def sendDirectMessage (twitter, tweet):
+    if (not tweet or not DIRECT_MSG_USER):
+        return
+    directMsg = "https://twitter.com/" + tweet.user.screen_name + "/status/"+ str(tweet.id) + " - " + tweet.text
+    print ('Sending message to ' + DIRECT_MSG_USER + ': ' + tweet.text)
+    twitter.sendDM(DIRECT_MSG_USER, text=directMsg)
+    
 
 if __name__ == "__main__":
     twitter = TwitterAPI()
@@ -50,21 +60,23 @@ if __name__ == "__main__":
     try:
         valid_tweet=None
         new_tweets = twitter.search(query="phyton", count=10, since_id= max_id+1)
+        tweet=None
         for tweet in reversed(new_tweets):
-
             valid, cause = isValid(tweet)
             if (valid):
-                # print (tweet)
+
                 valid_tweet = tweet 
                 break
+            else:
+                print (cause, tweet.text)
         if (valid_tweet):
-            statusUrl = "https://twitter.com/" + tweet.user.screen_name + "/status/"+ str(tweet.id) + " - " + tweet.text
-            # print ("Selected: ", tweet.text, tweet.id,tweet.user.screen_name)
-                
+            saveLastId(valid_tweet.id)
+            print ('selected tweet: ', tweet.text)
+            sendDirectMessage (twitter, valid_tweet)
+        elif (tweet):
             saveLastId(tweet.id)
-            dirMsg = twitter.api.send_direct_message ("xurxof",statusUrl)
-            print(statusUrl,dirMsg)
     except tweepy.TweepError as e:
+        print (e)
         # depending on TweepError.code, one may want to retry or wait
         # to keep things simple, we will give up on an error
         exit()
