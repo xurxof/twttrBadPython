@@ -47,8 +47,8 @@ def saveLastId (id):
 def sendDirectMessage (twitter, tweet):
     if (not tweet or not DIRECT_MSG_USER):
         return
-    directMsg = "https://twitter.com/" + tweet.user.screen_name + "/status/"+ str(tweet.id) + " - " + tweet.text
-    print ('Sending message to ' + DIRECT_MSG_USER + ': ' + tweet.text)
+    url="https://twitter.com/" + tweet.user.screen_name + "/status/"+ str(tweet.id)
+    directMsg = url + " - " + tweet.text
     twitter.sendDM(DIRECT_MSG_USER, text=directMsg)
     
 
