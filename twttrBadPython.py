@@ -1,5 +1,9 @@
 from  config import *
 import tweepy, re
+import os
+
+last_id_filepath = os.path.join (os.path.dirname(os.path.realpath(__file__)),"lastid.txt")
+
 
 class TwitterAPI:
     def __init__(self):
@@ -34,14 +38,14 @@ def isValid (tweet):
 
 def readLastId ():
     try:
-        file = open("lastid.txt", "r")
+        file = open(last_id_filepath, "r")
         last_id = file.readline()
         return int(last_id)
     except:
         return -1
 
 def saveLastId (id):
-    file = open("lastid.txt", "w")
+    file = open(last_id_filepath, "w")
     file.write(str(tweet.id))
 
 def sendDirectMessage (twitter, tweet):
