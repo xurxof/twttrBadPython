@@ -1,0 +1,5 @@
+APP_KEY = 'YOUR KEY'
+APP_SECRET = 'YOUR SECRET KEY'
+OAUTH_TOKEN = 'YOUR TOKEN'
+OAUTH_TOKEN_SECRET = 'YOUR SECRET TOKEN'
+DIRECT_MSG_USER = None # if any string, send a direct message to this user instead respone the original twitter. Useful for testing period
