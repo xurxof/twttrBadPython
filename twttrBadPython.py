@@ -28,6 +28,9 @@ class TwitterAPI:
 
 def is_valid(tweet):
     text = tweet.text.lower()
+    user = tweet.user.screen_name
+    if MYSELF==user:
+        return False, 'my own name'
     if 'monty' in text:
         return False, 'monty  in text'
     if 'monthy' in text:
