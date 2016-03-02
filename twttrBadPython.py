@@ -37,7 +37,8 @@ def is_valid(tweet):
         return False, 'monthy  in text'
     if 'martens' in text:
         return False, 'martens in text'  # a model of shoes :)
-
+    if hasattr(tweet, 'retweeted_status'):
+        return False, 'retweet'
     p = re.compile(ur'\bphyton', re.IGNORECASE)
     if not re.findall(p, text):
         return False, 'python not in text'
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     print (max_id)
     try:
         valid_tweet = None
-        new_tweets = twitter.search(query="phyton", count=10, since_id=max_id + 1)
+        new_tweets = twitter.search(query="phyton", count=20, since_id=max_id + 1)
         tweet = None
         for tweet in reversed(new_tweets):
             valid, cause = is_valid(tweet)
@@ -94,7 +95,6 @@ if __name__ == "__main__":
         if valid_tweet:
             save_last_id(valid_tweet.id)
             print ('selected tweet: ', tweet.text)
-            # send_direct_message(twitter, valid_tweet)
             send_response(valid_tweet)
         elif tweet:
             save_last_id(tweet.id)
