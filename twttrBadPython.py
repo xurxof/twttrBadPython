@@ -35,9 +35,9 @@ def is_valid(tweet):
     if 'martens' in text:
         return False, 'martens in text'  # a model of shoes :)
 
-    p = re.compile(ur'\bphyton', re.IGNORECASE)
+    p = re.compile(r'\bphyton', re.IGNORECASE)
     if not re.findall(p, text):
-        return False, 'python not in text'
+        return False, 'phyton not in text'
     return True, ''
 
 
@@ -91,8 +91,10 @@ if __name__ == "__main__":
         if valid_tweet:
             save_last_id(valid_tweet.id)
             print ('selected tweet: ', tweet.text)
-            # send_direct_message(twitter, valid_tweet)
-            send_response(valid_tweet)
+            if (DIRECT_MSG_USER):
+                send_direct_message(twitter, valid_tweet)
+            else:
+                send_response(valid_tweet)
         elif tweet:
             save_last_id(tweet.id)
     except tweepy.TweepError as e:
